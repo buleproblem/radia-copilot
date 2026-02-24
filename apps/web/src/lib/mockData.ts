@@ -357,7 +357,7 @@ export const continents: Continent[] = [
         slug: "br",
         stations: [
           {
-            id: "radio-transamérica",
+            id: "radio-transamerica",
             name: "Rádio Transamérica",
             pinType: "terrestrial",
             listeners: 95_000,
