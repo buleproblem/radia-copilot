@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_STEEL_PROXY_URL=http://steel-proxy:8080
+      - NEXT_PUBLIC_HUMAN_ENGINE_URL=http://human-engine:3001
+      - NEXT_PUBLIC_ANALYZER_URL=http://analyzer:8000
+    depends_on:
+      - steel-proxy
+      - human-engine
+      - analyzer
+
+  steel-proxy:
+    build:
+      context: ./services/steel-proxy
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - RUST_LOG=steel_proxy=info,tower_http=info
+    depends_on:
+      - redis
+
+  human-engine:
+    build:
+      context: ./services/human-engine
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/radia
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+
+  analyzer:
+    build:
+      context: ./services/analyzer
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/radia
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=radia
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  redis_data:
+  postgres_data:
