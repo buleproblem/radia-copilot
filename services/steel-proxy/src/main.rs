@@ -86,7 +86,7 @@ async fn stream_handler(
         };
     }
 
-    // Evict the entry after 60 s to avoid stale entries
+    // Evict the entry after 60 seconds to avoid stale entries
     let streams_clone = state.streams.clone();
     let station_clone = station_id.clone();
     tokio::spawn(async move {

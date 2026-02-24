@@ -50,15 +50,15 @@ app.get('/profile/:userId', (req: Request, res: Response) => {
 
 app.post('/room', (req: Request, res: Response) => {
   const roomId = uuidv4();
-  const name: string = (req.body as { name?: string }).name ?? `Room ${roomId.slice(0, 6)}`;
+  const roomName: string = (req.body as { name?: string }).name ?? `Room ${roomId.slice(0, 6)}`;
   const room: Room = {
     id: roomId,
-    name,
+    name: roomName,
     createdAt: Date.now(),
     participants: new Set(),
   };
   rooms.set(roomId, room);
-  res.status(201).json({ roomId, name, createdAt: room.createdAt });
+  res.status(201).json({ roomId, name: roomName, createdAt: room.createdAt });
 });
 
 app.get('/room/:roomId', (req: Request, res: Response) => {
